@@ -1,4 +1,4 @@
-# webcam-viewer
+# Capture Card Viewer
 
 This tool displays fullscreen video out of cheap usb capture cards that appear as a webcam.
 
