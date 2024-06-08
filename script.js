@@ -54,6 +54,9 @@ function startVideo() {
       const videoElement = document.querySelector("video");
       videoElement.srcObject = stream;
 
+      // Hide the no-video message
+      document.getElementById('no-video').style.display = 'none';
+
       // Create an audio context and connect the audio stream to it
       const audioContext = new AudioContext();
       const source = audioContext.createMediaStreamSource(stream);
@@ -88,6 +91,12 @@ function startVideo() {
         prev.connect(curr);
         return curr;
       }, compressor).connect(audioContext.destination);
+    })
+    .catch((error) => {
+      console.error('Error accessing media devices.', error);
+      if (error.name === 'NotFoundError') {
+        alert('No microphone detected.');
+      }
     });
 }
 
@@ -105,5 +114,9 @@ function enterFullscreen() {
   }
 }
 
-startVideo();
+// Call startVideo and show the no-video message initially
+document.addEventListener("DOMContentLoaded", function() {
+  startVideo();
+  document.getElementById('no-video').style.display = 'block';
+});
 
