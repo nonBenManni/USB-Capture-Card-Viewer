@@ -83,8 +83,15 @@ function startVideo() {
     })
     .catch((error) => {
       console.error('Error accessing media devices.', error);
-      if (error.name === 'NotFoundError') {
-        alert('No microphone detected.');
+      if (error.name === 'NotFoundError' || error.name === 'NotAllowedError') {
+        // Request access to media devices again
+        navigator.mediaDevices.getUserMedia(constraints)
+          .then((stream) => {
+            startVideo(); // Try starting video again if access is granted
+          })
+          .catch((error) => {
+            alert('Failed to access camera and microphone.');
+          });
       }
     });
 }
