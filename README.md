@@ -1,4 +1,4 @@
-##Capture Card Viewer
+#Capture Card Viewer
 This tool displays fullscreen video from cheap USB capture cards that appear as webcams.
 
 Double-click the player window to enter fullscreen.
