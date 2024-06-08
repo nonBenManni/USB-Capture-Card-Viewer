@@ -1,3 +1,23 @@
+console.log("Use deviceId query param to request a specific device.");
+
+navigator.mediaDevices
+  .enumerateDevices()
+  .then((devices) =>
+    devices.filter((d) => d.kind === "videoinput" || d.kind === "audioinput")
+  )
+  .then((devices) =>
+    devices
+      .map((d) => {
+        return "[" + d.kind + "] " + d.label + ": " + d.deviceId;
+      })
+      .join("\n\n")
+  )
+  .then(console.log);
+
+const urlParams = new URLSearchParams(window.location.search);
+const videoDeviceId = urlParams.get("deviceId");
+const audioDeviceId = urlParams.get("audioDeviceId");
+
 function startVideo() {
   const constraints = {
     video: { width: 1920, height: 1080 },
@@ -37,15 +57,6 @@ function startVideo() {
       // Hide the no-video message
       document.getElementById('no-video').style.display = 'none';
 
-      // Check the number of audio input devices
-      navigator.mediaDevices.enumerateDevices().then(devices => {
-        const audioDevices = devices.filter(device => device.kind === 'audioinput');
-        if (audioDevices.length > 1) {
-          // Show notification for multiple microphones
-          showNotification('Multiple microphones detected, Consider specifying Device ID if you hear loopback.');
-        }
-      });
-
       // Create an audio context and connect the audio stream to it
       const audioContext = new AudioContext();
       const source = audioContext.createMediaStreamSource(stream);
@@ -83,15 +94,29 @@ function startVideo() {
     })
     .catch((error) => {
       console.error('Error accessing media devices.', error);
-      if (error.name === 'NotFoundError' || error.name === 'NotAllowedError') {
-        // Request access to media devices again
-        navigator.mediaDevices.getUserMedia(constraints)
-          .then((stream) => {
-            startVideo(); // Try starting video again if access is granted
-          })
-          .catch((error) => {
-            alert('Failed to access camera and microphone.');
-          });
+      if (error.name === 'NotFoundError') {
+        alert('No microphone detected.');
       }
     });
 }
+
+function enterFullscreen() {
+  const element = document.documentElement;
+
+  if (element.requestFullscreen) {
+    element.requestFullscreen();
+  } else if (element.mozRequestFullScreen) {
+    element.mozRequestFullScreen();
+  } else if (element.msRequestFullscreen) {
+    element.msRequestFullscreen();
+  } else if (element.webkitRequestFullscreen) {
+    element.webkitRequestFullscreen();
+  }
+}
+
+// Call startVideo and show the no-video message initially
+document.addEventListener("DOMContentLoaded", function() {
+  startVideo();
+  document.getElementById('no-video').style.display = 'block';
+});
+
